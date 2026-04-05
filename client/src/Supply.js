@@ -15,7 +15,13 @@ function Supply() {
   const [SupplyChain, setSupplyChain] = useState();
   const [MED, setMED] = useState();
   const [MedStage, setMedStage] = useState();
-  const [ID, setID] = useState();
+
+  // ✅ Fix: mỗi bước có state ID riêng, tránh xung đột khi nhập nhiều ô
+  const [ID_RMS, setID_RMS] = useState();
+  const [ID_MAN, setID_MAN] = useState();
+  const [ID_DIS, setID_DIS] = useState();
+  const [ID_RET, setID_RET] = useState();
+  const [ID_SOLD, setID_SOLD] = useState();
 
   const loadWeb3 = async () => {
     if (window.ethereum) {
@@ -27,6 +33,7 @@ function Supply() {
       window.alert("Cài đặt MetaMask để tiếp tục!");
     }
   };
+
   const loadBlockchaindata = async () => {
     setloader(true);
     const web3 = window.web3;
@@ -40,10 +47,10 @@ function Supply() {
       setSupplyChain(supplychain);
       const medCtr = await supplychain.methods.medicineCtr().call();
       const med = {};
-      const medStage = [];
+      const medStage = {}; // ✅ Fix: object thay vì array
       for (let i = 0; i < medCtr; i++) {
-        med[i] = await supplychain.methods.MedicineStock(i + 1).call();
-        medStage[i] = await supplychain.methods.showStage(i + 1).call();
+        med[i + 1] = await supplychain.methods.MedicineStock(i + 1).call();
+        medStage[i + 1] = await supplychain.methods.showStage(i + 1).call();
       }
       setMED(med);
       setMedStage(medStage);
@@ -52,6 +59,7 @@ function Supply() {
       window.alert("Smart contract chưa được triển khai!");
     }
   };
+
   if (loader) {
     return (
       <div className="spinner-container">
@@ -60,10 +68,10 @@ function Supply() {
     );
   }
 
-  const handlerChangeID = (e) => setID(e.target.value);
-  const handlerSubmit = async (method, stepName) => {
+  // ✅ Fix: mỗi bước nhận đúng ID của chính nó
+  const handlerSubmit = async (method, stepName, id) => {
     try {
-      var receipt = await SupplyChain.methods[method](ID).send({ from: currentaccount });
+      var receipt = await SupplyChain.methods[method](id).send({ from: currentaccount });
       if (receipt) loadBlockchaindata();
     } catch (err) {
       alert(`Lỗi ở bước ${stepName}! Kiểm tra quyền hoặc ID sản phẩm.`);
@@ -85,7 +93,12 @@ function Supply() {
           <thead><tr><th>ID hàng</th><th>Tên</th><th>Mô tả</th><th>Giai đoạn</th></tr></thead>
           <tbody>
             {Object.keys(MED).map(key => (
-              <tr key={key}><td>{MED[key].id}</td><td>{MED[key].name}</td><td>{MED[key].description}</td><td>{MedStage[key]}</td></tr>
+              <tr key={key}>
+                <td>{MED[key].id}</td>
+                <td>{MED[key].name}</td>
+                <td>{MED[key].description}</td>
+                <td><span className="badge-stage">{MedStage[key]}</span></td>
+              </tr>
             ))}
           </tbody>
         </table>
@@ -96,48 +109,92 @@ function Supply() {
               <h5>🥬 1. Cung cấp nguyên liệu</h5>
               <p className="text-muted small">Chỉ nhà cung cấp (RMS)</p>
               <div className="input-group-custom">
-                <input className="form-control-sm-custom" type="text" onChange={handlerChangeID} placeholder="ID sản phẩm" />
-                <button className="btn btn-custom-primary" onClick={()=>handlerSubmit("RMSsupply","Cung cấp")}>Xác nhận cung cấp</button>
+                <input
+                  className="form-control-sm-custom"
+                  type="number" min="1"
+                  onChange={(e) => setID_RMS(e.target.value)}
+                  placeholder="ID sản phẩm"
+                />
+                <button
+                  className="btn btn-custom-primary"
+                  onClick={() => handlerSubmit("RMSsupply", "Cung cấp", ID_RMS)}
+                >Xác nhận cung cấp</button>
               </div>
             </div>
           </div>
+
           <div className="col-md-6 col-lg-4">
             <div className="card-modern h-100">
               <h5>🏭 2. Sản xuất</h5>
               <p className="text-muted small">Chỉ nhà sản xuất (MAN)</p>
               <div className="input-group-custom">
-                <input className="form-control-sm-custom" type="text" onChange={handlerChangeID} placeholder="ID sản phẩm" />
-                <button className="btn btn-custom-primary" onClick={()=>handlerSubmit("Manufacturing","Sản xuất")}>Xác nhận sản xuất</button>
+                <input
+                  className="form-control-sm-custom"
+                  type="number" min="1"
+                  onChange={(e) => setID_MAN(e.target.value)}
+                  placeholder="ID sản phẩm"
+                />
+                <button
+                  className="btn btn-custom-primary"
+                  onClick={() => handlerSubmit("Manufacturing", "Sản xuất", ID_MAN)}
+                >Xác nhận sản xuất</button>
               </div>
             </div>
           </div>
+
           <div className="col-md-6 col-lg-4">
             <div className="card-modern h-100">
               <h5>🚚 3. Phân phối</h5>
               <p className="text-muted small">Chỉ nhà phân phối (DIS)</p>
               <div className="input-group-custom">
-                <input className="form-control-sm-custom" type="text" onChange={handlerChangeID} placeholder="ID sản phẩm" />
-                <button className="btn btn-custom-primary" onClick={()=>handlerSubmit("Distribute","Phân phối")}>Xác nhận phân phối</button>
+                <input
+                  className="form-control-sm-custom"
+                  type="number" min="1"
+                  onChange={(e) => setID_DIS(e.target.value)}
+                  placeholder="ID sản phẩm"
+                />
+                <button
+                  className="btn btn-custom-primary"
+                  onClick={() => handlerSubmit("Distribute", "Phân phối", ID_DIS)}
+                >Xác nhận phân phối</button>
               </div>
             </div>
           </div>
+
           <div className="col-md-6 col-lg-4">
             <div className="card-modern h-100">
               <h5>🏪 4. Bán lẻ</h5>
               <p className="text-muted small">Chỉ nhà bán lẻ (RET)</p>
               <div className="input-group-custom">
-                <input className="form-control-sm-custom" type="text" onChange={handlerChangeID} placeholder="ID sản phẩm" />
-                <button className="btn btn-custom-primary" onClick={()=>handlerSubmit("Retail","Bán lẻ")}>Xác nhận bán lẻ</button>
+                <input
+                  className="form-control-sm-custom"
+                  type="number" min="1"
+                  onChange={(e) => setID_RET(e.target.value)}
+                  placeholder="ID sản phẩm"
+                />
+                <button
+                  className="btn btn-custom-primary"
+                  onClick={() => handlerSubmit("Retail", "Bán lẻ", ID_RET)}
+                >Xác nhận bán lẻ</button>
               </div>
             </div>
           </div>
+
           <div className="col-md-6 col-lg-4">
             <div className="card-modern h-100">
               <h5>💰 5. Đã bán</h5>
               <p className="text-muted small">Chỉ nhà bán lẻ (RET)</p>
               <div className="input-group-custom">
-                <input className="form-control-sm-custom" type="text" onChange={handlerChangeID} placeholder="ID sản phẩm" />
-                <button className="btn btn-custom-primary" onClick={()=>handlerSubmit("sold","Đánh dấu đã bán")}>Đánh dấu đã bán</button>
+                <input
+                  className="form-control-sm-custom"
+                  type="number" min="1"
+                  onChange={(e) => setID_SOLD(e.target.value)}
+                  placeholder="ID sản phẩm"
+                />
+                <button
+                  className="btn btn-custom-primary"
+                  onClick={() => handlerSubmit("sold", "Đánh dấu đã bán", ID_SOLD)}
+                >Đánh dấu đã bán</button>
               </div>
             </div>
           </div>
