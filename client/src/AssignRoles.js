@@ -33,7 +33,7 @@ function AssignRoles() {
   const loadWeb3 = async () => {
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum);
-      await window.ethereum.enable();
+      await window.ethereum.request({ method: "eth_requestAccounts" });
     } else if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider);
     } else {
@@ -56,25 +56,25 @@ function AssignRoles() {
       const rmsCtr = await supplychain.methods.rmsCtr().call();
       const rms = {};
       for (i = 0; i < rmsCtr; i++) {
-        rms[i] = await supplychain.methods.RMS(i + 1).call();
+        rms[i + 1] = await supplychain.methods.RMS(i + 1).call();
       }
       setRMS(rms);
       const manCtr = await supplychain.methods.manCtr().call();
       const man = {};
       for (i = 0; i < manCtr; i++) {
-        man[i] = await supplychain.methods.MAN(i + 1).call();
+        man[i + 1] = await supplychain.methods.MAN(i + 1).call();
       }
       setMAN(man);
       const disCtr = await supplychain.methods.disCtr().call();
       const dis = {};
       for (i = 0; i < disCtr; i++) {
-        dis[i] = await supplychain.methods.DIS(i + 1).call();
+        dis[i + 1] = await supplychain.methods.DIS(i + 1).call();
       }
       setDIS(dis);
       const retCtr = await supplychain.methods.retCtr().call();
       const ret = {};
       for (i = 0; i < retCtr; i++) {
-        ret[i] = await supplychain.methods.RET(i + 1).call();
+        ret[i + 1] = await supplychain.methods.RET(i + 1).call();
       }
       setRET(ret);
       setloader(false);

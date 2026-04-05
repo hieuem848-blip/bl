@@ -21,7 +21,7 @@ function AddMed() {
   const loadWeb3 = async () => {
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum);
-      await window.ethereum.enable();
+      await window.ethereum.request({ method: "eth_requestAccounts" });
     } else if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider);
     } else {
@@ -42,10 +42,10 @@ function AddMed() {
       setSupplyChain(supplychain);
       const medCtr = await supplychain.methods.medicineCtr().call();
       const med = {};
-      const medStage = [];
+      const medStage = {};
       for (let i = 0; i < medCtr; i++) {
-        med[i] = await supplychain.methods.MedicineStock(i + 1).call();
-        medStage[i] = await supplychain.methods.showStage(i + 1).call();
+        med[i + 1] = await supplychain.methods.MedicineStock(i + 1).call();
+        medStage[i + 1] = await supplychain.methods.showStage(i + 1).call();
       }
       setMED(med);
       setMedStage(medStage);

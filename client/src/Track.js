@@ -26,7 +26,7 @@ function Track() {
   const loadWeb3 = async () => {
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum);
-      await window.ethereum.enable();
+      await window.ethereum.request({ method: "eth_requestAccounts" });
     } else if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider);
     } else {
@@ -190,7 +190,7 @@ function Track() {
           className="form-control-sm-custom"
           type="number"
           min="1"
-          onChange={(e) => setID(e.target.value)}
+          onChange={(e) => setID(Number(e.target.value))}
           placeholder="Nhập ID sản phẩm"
           required
         />
