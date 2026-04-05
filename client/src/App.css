@@ -1,12 +1,192 @@
-hr{
-    position: relative;
-    top: 20px;
-    border: none;   
-    height: 12px;
-    background: black;
-}
-.wait{
-    text-align: center;
-    margin-top: 5rem;
+/* Reset & fonts */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+body {
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+  color: #1e2a3e;
+}
+
+/* Container chính */
+.app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Navbar */
+.navbar-custom {
+  background: linear-gradient(90deg, #0b3b5f, #1b4f72);
+  padding: 0.8rem 1.5rem;
+  border-radius: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+.navbar-custom .navbar-brand {
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.6rem;
+  letter-spacing: 1px;
+}
+.navbar-custom .navbar-brand small {
+  font-size: 0.8rem;
+  font-weight: normal;
+  margin-left: 10px;
+}
+.navbar-custom .btn-outline-light {
+  border-radius: 30px;
+  padding: 5px 18px;
+}
+.account-info {
+  background: rgba(255,255,255,0.15);
+  padding: 5px 12px;
+  border-radius: 40px;
+  font-size: 0.85rem;
+  color: #f1f1f1;
+}
+
+/* Card */
+.card-modern {
+  background: white;
+  border-radius: 28px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: none;
+}
+.card-modern:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+.card-title {
+  font-weight: 700;
+  border-left: 5px solid #1b4f72;
+  padding-left: 15px;
+  margin-bottom: 1.5rem;
+  color: #0b3b5f;
+}
+
+/* Table */
+.table-custom {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.03);
+}
+.table-custom thead th {
+  background: #1b4f72;
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 12px;
+}
+.table-custom tbody tr:hover {
+  background-color: #f1f9ff;
+  transition: 0.2s;
+}
+.table-custom td, .table-custom th {
+  vertical-align: middle;
+  padding: 12px;
+}
+
+/* Buttons */
+.btn-custom-primary {
+  background: linear-gradient(95deg, #1b4f72, #2c7da0);
+  border: none;
+  border-radius: 40px;
+  padding: 8px 24px;
+  font-weight: 600;
+  color: white;
+  transition: 0.2s;
+}
+.btn-custom-primary:hover {
+  transform: scale(1.02);
+  background: linear-gradient(95deg, #0e3b58, #1f6a8c);
+  color: white;
+}
+.btn-custom-outline {
+  border-radius: 40px;
+  padding: 6px 20px;
+  border: 2px solid #1b4f72;
+  color: #1b4f72;
+  background: transparent;
+  font-weight: 500;
+}
+.btn-custom-outline:hover {
+  background: #1b4f72;
+  color: white;
+}
+
+/* Form */
+.form-control-sm-custom {
+  border-radius: 40px;
+  border: 1px solid #ced4da;
+  padding: 8px 18px;
+  margin-right: 8px;
+  margin-bottom: 10px;
+  width: auto;
+  display: inline-block;
+}
+.input-group-custom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Loading spinner */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+}
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  color: #1b4f72;
+}
+
+/* Footer */
+.footer-custom {
+  background: #0b2b3b;
+  color: #cbd5e1;
+  text-align: center;
+  padding: 20px;
+  border-radius: 20px;
+  margin-top: 40px;
+  font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 12px;
+  }
+  .form-control-sm-custom {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .input-group-custom {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn-custom-primary, .btn-custom-outline {
+    width: 100%;
+  }
+}
+
+/* Badge stage */
+.badge-stage {
+  background: #e9ecef;
+  padding: 5px 12px;
+  border-radius: 40px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+}

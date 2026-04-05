@@ -20,12 +20,8 @@ function Track() {
   const [MAN, setMAN] = useState();
   const [DIS, setDIS] = useState();
   const [RET, setRET] = useState();
-  const [TrackTillSold, showTrackTillSold] = useState(false);
-  const [TrackTillRetail, showTrackTillRetail] = useState(false);
-  const [TrackTillDistribution, showTrackTillDistribution] = useState(false);
-  const [TrackTillManufacture, showTrackTillManufacture] = useState(false);
-  const [TrackTillRMS, showTrackTillRMS] = useState(false);
-  const [TrackTillOrdered, showTrackTillOrdered] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
+  const [trackData, setTrackData] = useState(null);
 
   const loadWeb3 = async () => {
     if (window.ethereum) {
@@ -34,11 +30,10 @@ function Track() {
     } else if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider);
     } else {
-      window.alert(
-        "Non-Ethereum browser detected. You should consider trying MetaMask!"
-      );
+      window.alert("Vui lòng cài đặt MetaMask!");
     }
   };
+
   const loadBlockchaindata = async () => {
     setloader(true);
     const web3 = window.web3;
@@ -48,16 +43,12 @@ function Track() {
     const networkId = await web3.eth.net.getId();
     const networkData = SupplyChainABI.networks[networkId];
     if (networkData) {
-      const supplychain = new web3.eth.Contract(
-        SupplyChainABI.abi,
-        networkData.address
-      );
+      const supplychain = new web3.eth.Contract(SupplyChainABI.abi, networkData.address);
       setSupplyChain(supplychain);
-      var i;
       const medCtr = await supplychain.methods.medicineCtr().call();
       const med = {};
       const medStage = [];
-      for (i = 0; i < medCtr; i++) {
+      for (let i = 0; i < medCtr; i++) {
         med[i + 1] = await supplychain.methods.MedicineStock(i + 1).call();
         medStage[i + 1] = await supplychain.methods.showStage(i + 1).call();
       }
@@ -65,674 +56,82 @@ function Track() {
       setMedStage(medStage);
       const rmsCtr = await supplychain.methods.rmsCtr().call();
       const rms = {};
-      for (i = 0; i < rmsCtr; i++) {
-        rms[i + 1] = await supplychain.methods.RMS(i + 1).call();
-      }
+      for (let i = 0; i < rmsCtr; i++) rms[i + 1] = await supplychain.methods.RMS(i + 1).call();
       setRMS(rms);
       const manCtr = await supplychain.methods.manCtr().call();
       const man = {};
-      for (i = 0; i < manCtr; i++) {
-        man[i + 1] = await supplychain.methods.MAN(i + 1).call();
-      }
+      for (let i = 0; i < manCtr; i++) man[i + 1] = await supplychain.methods.MAN(i + 1).call();
       setMAN(man);
       const disCtr = await supplychain.methods.disCtr().call();
       const dis = {};
-      for (i = 0; i < disCtr; i++) {
-        dis[i + 1] = await supplychain.methods.DIS(i + 1).call();
-      }
+      for (let i = 0; i < disCtr; i++) dis[i + 1] = await supplychain.methods.DIS(i + 1).call();
       setDIS(dis);
       const retCtr = await supplychain.methods.retCtr().call();
       const ret = {};
-      for (i = 0; i < retCtr; i++) {
-        ret[i + 1] = await supplychain.methods.RET(i + 1).call();
-      }
+      for (let i = 0; i < retCtr; i++) ret[i + 1] = await supplychain.methods.RET(i + 1).call();
       setRET(ret);
       setloader(false);
     } else {
-      window.alert("The smart contract is not deployed to current network");
+      window.alert("Smart contract chưa được triển khai!");
     }
   };
-  if (loader) {
-    return (
-      <div>
-        <h1 className="wait">Loading...</h1>
-      </div>
-    );
-  }
-  if (TrackTillSold) {
-    return (
-      <div className="container-xl">
-        <article className="col-4">
-          <h3>
-            <b>
-              <u>Goods:</u>
-            </b>
-          </h3>
-          <span>
-            <b>Goods ID: </b>
-            {MED[ID].id}
-          </span>
-          <br />
-          <span>
-            <b>Name:</b> {MED[ID].name}
-          </span>
-          <br />
-          <span>
-            <b>Description: </b>
-            {MED[ID].description}
-          </span>
-          <br />
-          <span>
-            <b>Current stage: </b>
-            {MedStage[ID]}
-          </span>
-        </article>
-        <hr />
-        <br />
-        <section className="row">
-          <article className="col-3">
-            <h4>
-              <u>Raw Materials Supplied by:</u>
-            </h4>
-            <p>
-              <b>Supplier ID: </b>
-              {RMS[MED[ID].RMSid].id}
-            </p>
-            <p>
-              <b>Name:</b> {RMS[MED[ID].RMSid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {RMS[MED[ID].RMSid].place}
-            </p>
-          </article>
-          <span>&#10132;</span>
-          <article className="col-3">
-            <h4>
-              <u>Manufactured by:</u>
-            </h4>
-            <p>
-              <b>Manufacturer ID: </b>
-              {MAN[MED[ID].MANid].id}
-            </p>
-            <p>
-              <b>Name:</b> {MAN[MED[ID].MANid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {MAN[MED[ID].MANid].place}
-            </p>
-          </article>
-          <span>&#10132;</span>
-          <article className="col-3">
-            <h4>
-              <u>Distributed by:</u>
-            </h4>
-            <p>
-              <b>Distributor ID: </b>
-              {DIS[MED[ID].DISid].id}
-            </p>
-            <p>
-              <b>Name:</b> {DIS[MED[ID].DISid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {DIS[MED[ID].DISid].place}
-            </p>
-          </article>
-          <span>&#10132;</span>
-          <article className="col-3">
-            <h4>
-              <u>Retailed by:</u>
-            </h4>
-            <p>
-              <b>Retailer ID: </b>
-              {RET[MED[ID].RETid].id}
-            </p>
-            <p>
-              <b>Name:</b> {RET[MED[ID].RETid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {RET[MED[ID].RETid].place}
-            </p>
-          </article>
-          <span>&#10132;</span>
-          <article className="col-3">
-            <h4>
-              <u>Sold</u>
-            </h4>
-          </article>
-        </section>
-        <button
-          onClick={() => {
-            showTrackTillSold(false);
-          }}
-          className="btn btn-outline-success btn-sm"
-        >
-          Track Another Item
-        </button>
-        <span
-          onClick={() => {
-            history.push("/");
-          }}
-          className="btn btn-outline-danger btn-sm"
-        >
-          {" "}
-          HOME
-        </span>
-      </div>
-    );
-  }
-  if (TrackTillRetail) {
-    return (
-      <div className="container-xl">
-        <article className="col-4">
-          <h3>
-            <b>
-              <u>Goods:</u>
-            </b>
-          </h3>
-          <span>
-            <b>Goods ID: </b>
-            {MED[ID].id}
-          </span>
-          <br />
-          <span>
-            <b>Name:</b> {MED[ID].name}
-          </span>
-          <br />
-          <span>
-            <b>Description: </b>
-            {MED[ID].description}
-          </span>
-          <br />
-          <span>
-            <b>Current stage: </b>
-            {MedStage[ID]}
-          </span>
-        </article>
-        <hr />
-        <br />
-        <section className="row">
-          <article className="col-3">
-            <h4>
-              <u>Raw Materials Supplied by:</u>
-            </h4>
-            <p>
-              <b>Supplier ID: </b>
-              {RMS[MED[ID].RMSid].id}
-            </p>
-            <p>
-              <b>Name:</b> {RMS[MED[ID].RMSid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {RMS[MED[ID].RMSid].place}
-            </p>
-          </article>
-          <span>&#10132;</span>
-          <article className="col-3">
-            <h4>
-              <u>Manufactured by:</u>
-            </h4>
-            <p>
-              <b>Manufacturer ID: </b>
-              {MAN[MED[ID].MANid].id}
-            </p>
-            <p>
-              <b>Name:</b> {MAN[MED[ID].MANid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {MAN[MED[ID].MANid].place}
-            </p>
-          </article>
-          <span>&#10132;</span>
-          <article className="col-3">
-            <h4>
-              <u>Distributed by:</u>
-            </h4>
-            <p>
-              <b>Distributor ID: </b>
-              {DIS[MED[ID].DISid].id}
-            </p>
-            <p>
-              <b>Name:</b> {DIS[MED[ID].DISid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {DIS[MED[ID].DISid].place}
-            </p>
-          </article>
-          <span>&#10132;</span>
-          <article className="col-3">
-            <h4>
-              <u>Retailed by:</u>
-            </h4>
-            <p>
-              <b>Retailer ID: </b>
-              {RET[MED[ID].RETid].id}
-            </p>
-            <p>
-              <b>Name:</b> {RET[MED[ID].RETid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {RET[MED[ID].RETid].place}
-            </p>
-          </article>
-        </section>
-        <button
-          onClick={() => {
-            showTrackTillRetail(false);
-          }}
-          className="btn btn-outline-success btn-sm"
-        >
-          Track Another Item
-        </button>
-        <span
-          onClick={() => {
-            history.push("/");
-          }}
-          className="btn btn-outline-danger btn-sm"
-        >
-          {" "}
-          HOME
-        </span>
-      </div>
-    );
-  }
-  if (TrackTillDistribution) {
-    return (
-      <div className="container-xl">
-        <article className="col-4">
-          <h3>
-            <b>
-              <u>Medicine:</u>
-            </b>
-          </h3>
-          <span>
-            <b>Medicine ID: </b>
-            {MED[ID].id}
-          </span>
-          <br />
-          <span>
-            <b>Name:</b> {MED[ID].name}
-          </span>
-          <br />
-          <span>
-            <b>Description: </b>
-            {MED[ID].description}
-          </span>
-          <br />
-          <span>
-            <b>Current stage: </b>
-            {MedStage[ID]}
-          </span>
-        </article>
-        <hr />
-        <br />
-        <section className="row">
-          <article className="col-3">
-            <h4>
-              <u>Raw Materials Supplied by:</u>
-            </h4>
-            <p>
-              <b>Supplier ID: </b>
-              {RMS[MED[ID].RMSid].id}
-            </p>
-            <p>
-              <b>Name:</b> {RMS[MED[ID].RMSid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {RMS[MED[ID].RMSid].place}
-            </p>
-          </article>
-          <span>&#10132;</span>
-          <article className="col-3">
-            <h4>
-              <u>Manufactured by:</u>
-            </h4>
-            <p>
-              <b>Manufacturer ID: </b>
-              {MAN[MED[ID].MANid].id}
-            </p>
-            <p>
-              <b>Name:</b> {MAN[MED[ID].MANid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {MAN[MED[ID].MANid].place}
-            </p>
-          </article>
-          <span>&#10132;</span>
-          <article className="col-3">
-            <h4>
-              <u>Distributed by:</u>
-            </h4>
-            <p>
-              <b>Distributor ID: </b>
-              {DIS[MED[ID].DISid].id}
-            </p>
-            <p>
-              <b>Name:</b> {DIS[MED[ID].DISid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {DIS[MED[ID].DISid].place}
-            </p>
-          </article>
-        </section>
-        <button
-          onClick={() => {
-            showTrackTillDistribution(false);
-          }}
-          className="btn btn-outline-success btn-sm"
-        >
-          Track Another Item
-        </button>
-        <span
-          onClick={() => {
-            history.push("/");
-          }}
-          className="btn btn-outline-danger btn-sm"
-        >
-          {" "}
-          HOME
-        </span>
-      </div>
-    );
-  }
-  if (TrackTillManufacture) {
-    return (
-      <div className="container-xl">
-        <article className="col-4">
-          <h3>
-            <b>
-              <u>Goods:</u>
-            </b>
-          </h3>
-          <span>
-            <b>Goods ID: </b>
-            {MED[ID].id}
-          </span>
-          <br />
-          <span>
-            <b>Name:</b> {MED[ID].name}
-          </span>
-          <br />
-          <span>
-            <b>Description: </b>
-            {MED[ID].description}
-          </span>
-          <br />
-          <span>
-            <b>Current stage: </b>
-            {MedStage[ID]}
-          </span>
-        </article>
-        <hr />
-        <br />
-        <section className="row">
-          <article className="col-3">
-            <h4>
-              <u>Raw Materials Supplied by:</u>
-            </h4>
-            <p>
-              <b>Supplier ID: </b>
-              {RMS[MED[ID].RMSid].id}
-            </p>
-            <p>
-              <b>Name:</b> {RMS[MED[ID].RMSid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {RMS[MED[ID].RMSid].place}
-            </p>
-          </article>
-          <span>&#10132;</span>
-          <article className="col-3">
-            <h4>
-              <u>Manufactured by:</u>
-            </h4>
-            <p>
-              <b>Manufacturer ID: </b>
-              {MAN[MED[ID].MANid].id}
-            </p>
-            <p>
-              <b>Name:</b> {MAN[MED[ID].MANid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {MAN[MED[ID].MANid].place}
-            </p>
-          </article>
-        </section>
-        <button
-          onClick={() => {
-            showTrackTillManufacture(false);
-          }}
-          className="btn btn-outline-success btn-sm"
-        >
-          Track Another Item
-        </button>
-        <span
-          onClick={() => {
-            history.push("/");
-          }}
-          className="btn btn-outline-danger btn-sm"
-        >
-          {" "}
-          HOME
-        </span>
-      </div>
-    );
-  }
-  if (TrackTillRMS) {
-    return (
-      <div className="container-xl">
-        <article className="col-4">
-          <h3>
-            <b>
-              <u>Goods:</u>
-            </b>
-          </h3>
-          <span>
-            <b>Goods ID: </b>
-            {MED[ID].id}
-          </span>
-          <br />
-          <span>
-            <b>Name:</b> {MED[ID].name}
-          </span>
-          <br />
-          <span>
-            <b>Description: </b>
-            {MED[ID].description}
-          </span>
-          <br />
-          <span>
-            <b>Current stage: </b>
-            {MedStage[ID]}
-          </span>
-        </article>
-        <hr />
-        <br />
-        <section className="row">
-          <article className="col-3">
-            <h4>
-              <u>Raw Materials Supplied by:</u>
-            </h4>
-            <p>
-              <b>Supplier ID: </b>
-              {RMS[MED[ID].RMSid].id}
-            </p>
-            <p>
-              <b>Name:</b> {RMS[MED[ID].RMSid].name}
-            </p>
-            <p>
-              <b>Place: </b>
-              {RMS[MED[ID].RMSid].place}
-            </p>
-          </article>
-        </section>
-        <button
-          onClick={() => {
-            showTrackTillRMS(false);
-          }}
-          className="btn btn-outline-success btn-sm"
-        >
-          Track Another Item
-        </button>
-        <span
-          onClick={() => {
-            history.push("/");
-          }}
-          className="btn btn-outline-danger btn-sm"
-        >
-          {" "}
-          HOME
-        </span>
-      </div>
-    );
-  }
-  if (TrackTillOrdered) {
-    return (
-      <div className="container-xl">
-        <article className="col-4">
-          <h3>
-            <b>
-              <u>Goods:</u>
-            </b>
-          </h3>
-          <span>
-            <b>Goods ID: </b>
-            {MED[ID].id}
-          </span>
-          <br />
-          <span>
-            <b>Name:</b> {MED[ID].name}
-          </span>
-          <br />
-          <span>
-            <b>Description: </b>
-            {MED[ID].description}
-          </span>
-          <br />
-          <span>
-            <b>Current stage: </b>
-            {MedStage[ID]}
-          </span>
-          <hr />
-          <br />
-          <h5>Goods Not Yet Processed...</h5>
-          <button
-            onClick={() => {
-              showTrackTillOrdered(false);
-            }}
-            className="btn btn-outline-success btn-sm"
-          >
-            Track Another Item
-          </button>
-          <span
-            onClick={() => {
-              history.push("/");
-            }}
-            className="btn btn-outline-danger btn-sm"
-          >
-            {" "}
-            HOME
-          </span>
-        </article>
-        {/* <section className="row">
-                    
-                    <article className="col-3">
-                        <h4><u>Raw Materials Supplied by:</u></h4>
-                        <p><b>Supplier ID: </b>{RMS[MED[ID].RMSid].id}</p>
-                        <p><b>Name:</b> {RMS[MED[ID].RMSid].name}</p>
-                        <p><b>Place: </b>{RMS[MED[ID].RMSid].place}</p>
-                    </article>
-                </section> */}
-      </div>
-    );
-  }
-  const handlerChangeID = (event) => {
-    setID(event.target.value);
-  };
-  const redirect_to_home = () => {
-    history.push("/");
-  };
+
   const handlerSubmit = async (event) => {
     event.preventDefault();
-    var ctr = await SupplyChain.methods.medicineCtr().call();
-    if (!(ID > 0 && ID <= ctr)) alert("Invalid Medicine ID!!!");
+    const ctr = await SupplyChain.methods.medicineCtr().call();
+    if (!(ID > 0 && ID <= ctr)) alert("ID sản phẩm không hợp lệ!");
     else {
-      // eslint-disable-next-line
-      if (MED[ID].stage == 5) showTrackTillSold(true);
-      // eslint-disable-next-line
-      else if (MED[ID].stage == 4) showTrackTillRetail(true);
-      // eslint-disable-next-line
-      else if (MED[ID].stage == 3) showTrackTillDistribution(true);
-      // eslint-disable-next-line
-      else if (MED[ID].stage == 2) showTrackTillManufacture(true);
-      // eslint-disable-next-line
-      else if (MED[ID].stage == 1) showTrackTillRMS(true);
-      else showTrackTillOrdered(true);
+      const stage = MED[ID]?.stage;
+      let detail = { id: ID, name: MED[ID].name, desc: MED[ID].description, stage: MedStage[ID] };
+      if (stage >= 1) detail.rms = RMS[MED[ID].RMSid];
+      if (stage >= 2) detail.man = MAN[MED[ID].MANid];
+      if (stage >= 3) detail.dis = DIS[MED[ID].DISid];
+      if (stage >= 4) detail.ret = RET[MED[ID].RETid];
+      if (stage === 5) detail.sold = true;
+      setTrackData(detail);
+      setShowDetail(true);
     }
   };
 
+  if (loader) return (<div className="spinner-container"><div className="spinner-border"/></div>);
+  if (showDetail && trackData) {
+    return (
+      <div className="card-modern">
+        <h4 className="card-title">🔍 Chi tiết sản phẩm ID {trackData.id}</h4>
+        <p><strong>Tên:</strong> {trackData.name}</p>
+        <p><strong>Mô tả:</strong> {trackData.desc}</p>
+        <p><strong>Giai đoạn hiện tại:</strong> {trackData.stage}</p>
+        <hr />
+        {trackData.rms && <div><h5>🥬 Cung cấp nguyên liệu bởi:</h5><p>{trackData.rms.name} - {trackData.rms.place}</p></div>}
+        {trackData.man && <div><h5>🏭 Sản xuất bởi:</h5><p>{trackData.man.name} - {trackData.man.place}</p></div>}
+        {trackData.dis && <div><h5>🚚 Phân phối bởi:</h5><p>{trackData.dis.name} - {trackData.dis.place}</p></div>}
+        {trackData.ret && <div><h5>🏪 Bán lẻ bởi:</h5><p>{trackData.ret.name} - {trackData.ret.place}</p></div>}
+        {trackData.sold && <div><h5>💰 Đã bán cho người tiêu dùng</h5></div>}
+        <button onClick={() => setShowDetail(false)} className="btn btn-custom-primary mt-3">🔍 Tra cứu sản phẩm khác</button>
+        <button onClick={() => history.push("/")} className="btn btn-custom-outline mt-3 ms-2">🏠 Trang chủ</button>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <span>
-        <b>Current Account Address:</b> {currentaccount}
-      </span>
-      <span
-        onClick={redirect_to_home}
-        className="btn btn-outline-danger btn-sm"
-      >
-        {" "}
-        HOME
-      </span>
-      <table className="table table-sm table-bordered">
-        <thead>
-          <tr>
-            <th scope="col">Goods ID</th>
-            <th scope="col">Name</th>
-            <th scope="col">Description</th>
-            <th scope="col">Current Processing Stage</th>
-          </tr>
-        </thead>
+    <div className="card-modern">
+      <div className="d-flex justify-content-between flex-wrap mb-3">
+        <span className="account-info text-muted"><b>🔑 Ví dụ:</b> {currentaccount}</span>
+        <button onClick={() => history.push("/")} className="btn btn-custom-outline">🏠 Trang chủ</button>
+      </div>
+      <h4 className="card-title">📋 Danh sách sản phẩm</h4>
+      <table className="table table-custom mb-4">
+        <thead><tr><th>ID</th><th>Tên</th><th>Mô tả</th><th>Giai đoạn</th></tr></thead>
         <tbody>
-          {Object.keys(MED).map(function (key) {
-            return (
-              <tr key={key}>
-                <td>{MED[key].id}</td>
-                <td>{MED[key].name}</td>
-                <td>{MED[key].description}</td>
-                <td>{MedStage[key]}</td>
-              </tr>
-            );
-          })}
+          {Object.keys(MED).map(key => (
+            <tr key={key}><td>{MED[key].id}</td><td>{MED[key].name}</td><td>{MED[key].description}</td><td>{MedStage[key]}</td></tr>
+          ))}
         </tbody>
       </table>
-      <h5>Enter Goods ID to Track it</h5>
-
-      <form onSubmit={handlerSubmit}>
-        <input
-          className="form-control-sm"
-          type="text"
-          onChange={handlerChangeID}
-          placeholder="Enter Goods ID"
-          required
-        />
-        <button
-          className="btn btn-outline-success btn-sm"
-          onSubmit={handlerSubmit}
-        >
-          Track
-        </button>
+      <h5>🔎 Nhập ID sản phẩm để truy xuất nguồn gốc</h5>
+      <form onSubmit={handlerSubmit} className="input-group-custom">
+        <input className="form-control-sm-custom" type="text" onChange={(e)=>setID(e.target.value)} placeholder="Nhập ID sản phẩm" required />
+        <button className="btn btn-custom-primary" type="submit">Truy xuất</button>
       </form>
     </div>
   );

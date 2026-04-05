@@ -1,69 +1,60 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 
-function Home() {
+function HomePage() {
   const history = useHistory();
-  const redirect_to_roles = () => {
-    history.push("/roles");
+
+  const navigateTo = (path) => {
+    history.push(path);
   };
-  const redirect_to_addmed = () => {
-    history.push("/addmed");
-  };
-  const redirect_to_supply = () => {
-    history.push("/supply");
-  };
-  const redirect_to_track = () => {
-    history.push("/track");
-  };
+
   return (
     <div>
-      <h3>Supply Chain Flow :- </h3>
-      <br />
-      <h6>
-        (Note: Here <u>Owner</u> is the person who deployed the smart contract
-        on the blockchain)
-      </h6>
-      <h5>
-        Step 1: Owner Should Register Raw material suppliers ,Manufacturers,
-        Distributors and Retailers
-      </h5>
-      <h6>(Note: This is a one time step. Skip to step 2 if already done)</h6>
-      <button
-        onClick={redirect_to_roles}
-        className="btn btn-outline-primary btn-sm"
-      >
-        Register
-      </button>
-      <br />
-      <h5>Step 2: Owner should order goods</h5>
-      <button
-        onClick={redirect_to_addmed}
-        className="btn btn-outline-primary btn-sm"
-      >
-        Order Goods
-      </button>
-      <br />
-      <h5>Step 3: Control Supply Chain</h5>
-      <button
-        onClick={redirect_to_supply}
-        className="btn btn-outline-primary btn-sm"
-      >
-        Control Supply Chain
-      </button>
-      <br />
-      <hr />
-      <br />
-      <h5>
-        <b>Track</b> the goods:
-      </h5>
-      <button
-        onClick={redirect_to_track}
-        className="btn btn-outline-primary btn-sm"
-      >
-        Track Goods
-      </button>
+      <div className="card-modern">
+        <h2 className="card-title">📌 Tổng quan hệ thống</h2>
+        <p>
+          Hệ thống này sử dụng công nghệ blockchain để theo dõi luồng hàng hóa xuyên suốt chuỗi cung ứng,
+          từ nguyên liệu thô → sản xuất → phân phối → bán lẻ → tay người tiêu dùng.
+          Dữ liệu được lưu trữ bất biến, minh bạch và chống giả mạo.
+        </p>
+      </div>
+
+      <div className="row g-4">
+        <div className="col-md-6">
+          <div className="card-modern h-100">
+            <h4 className="card-title">📝 Bước 1: Đăng ký thành viên</h4>
+            <p>Chủ hợp đồng (Owner) cần đăng ký các bên tham gia: Nhà cung cấp nguyên liệu, Nhà sản xuất, Nhà phân phối, Nhà bán lẻ.</p>
+            <button onClick={() => navigateTo("/roles")} className="btn btn-custom-primary">Đăng ký thành viên</button>
+          </div>
+        </div>
+        <div className="col-md-6">
+          <div className="card-modern h-100">
+            <h4 className="card-title">📦 Bước 2: Tạo đơn hàng</h4>
+            <p>Sau khi có thành viên, chủ hợp đồng tạo sản phẩm mới trên blockchain (tên, mô tả).</p>
+            <button onClick={() => navigateTo("/addmed")} className="btn btn-custom-primary">Tạo đơn hàng</button>
+          </div>
+        </div>
+        <div className="col-md-6">
+          <div className="card-modern h-100">
+            <h4 className="card-title">⚙️ Bước 3: Vận hành chuỗi cung ứng</h4>
+            <p>Các bên cập nhật trạng thái hàng hóa qua từng giai đoạn (cung cấp, sản xuất, phân phối, bán lẻ, bán cho người dùng).</p>
+            <button onClick={() => navigateTo("/supply")} className="btn btn-custom-primary">Quản lý vận hành</button>
+          </div>
+        </div>
+        <div className="col-md-6">
+          <div className="card-modern h-100">
+            <h4 className="card-title">🔍 Theo dõi sản phẩm</h4>
+            <p>Người dùng có thể nhập mã sản phẩm để xem toàn bộ lịch sử lưu thông trên blockchain.</p>
+            <button onClick={() => navigateTo("/track")} className="btn btn-custom-primary">Truy xuất nguồn gốc</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="card-modern mt-4 text-center">
+        <p className="mb-0">✅ <strong>Lưu ý:</strong> Mỗi giao dịch cần xác nhận qua MetaMask và phí gas. Đảm bảo bạn đã kết nối ví và chọn đúng mạng lưới.</p>
+      </div>
     </div>
   );
 }
 
-export default Home;
+export default HomePage;

@@ -25,9 +25,7 @@ function AddMed() {
     } else if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider);
     } else {
-      window.alert(
-        "Non-Ethereum browser detected. You should consider trying MetaMask!"
-      );
+      window.alert("Vui lòng cài đặt MetaMask!");
     }
   };
 
@@ -40,16 +38,12 @@ function AddMed() {
     const networkId = await web3.eth.net.getId();
     const networkData = SupplyChainABI.networks[networkId];
     if (networkData) {
-      const supplychain = new web3.eth.Contract(
-        SupplyChainABI.abi,
-        networkData.address
-      );
+      const supplychain = new web3.eth.Contract(SupplyChainABI.abi, networkData.address);
       setSupplyChain(supplychain);
-      var i;
       const medCtr = await supplychain.methods.medicineCtr().call();
       const med = {};
       const medStage = [];
-      for (i = 0; i < medCtr; i++) {
+      for (let i = 0; i < medCtr; i++) {
         med[i] = await supplychain.methods.MedicineStock(i + 1).call();
         medStage[i] = await supplychain.methods.showStage(i + 1).call();
       }
@@ -57,98 +51,58 @@ function AddMed() {
       setMedStage(medStage);
       setloader(false);
     } else {
-      window.alert("The smart contract is not deployed to current network");
+      window.alert("Smart contract chưa được triển khai!");
     }
   };
+
   if (loader) {
     return (
-      <div>
-        <h1 className="wait">Loading...</h1>
+      <div className="spinner-container">
+        <div className="spinner-border" role="status"><span className="visually-hidden">Đang tải...</span></div>
       </div>
     );
   }
-  const redirect_to_home = () => {
-    history.push("/");
-  };
-  const handlerChangeNameMED = (event) => {
-    setMedName(event.target.value);
-  };
-  const handlerChangeDesMED = (event) => {
-    setMedDes(event.target.value);
-  };
+
   const handlerSubmitMED = async (event) => {
     event.preventDefault();
     try {
-      var reciept = await SupplyChain.methods
-        .addMedicine(MedName, MedDes)
-        .send({ from: currentaccount });
-      if (reciept) {
-        loadBlockchaindata();
-      }
+      var receipt = await SupplyChain.methods.addMedicine(MedName, MedDes).send({ from: currentaccount });
+      if (receipt) loadBlockchaindata();
     } catch (err) {
-      alert("An error occured!!!");
+      alert("Lỗi khi tạo đơn hàng! Bạn có đủ quyền?");
     }
   };
+
   return (
     <div>
-      <span>
-        <b>Current Account Address:</b> {currentaccount}
-      </span>
-      <span
-        onClick={redirect_to_home}
-        className="btn btn-outline-danger btn-sm"
-      >
-        {" "}
-        HOME
-      </span>
-      <br />
-      <h5>Add Goods Order:</h5>
-      <form onSubmit={handlerSubmitMED}>
-        <input
-          className="form-control-sm"
-          type="text"
-          onChange={handlerChangeNameMED}
-          placeholder="Goods Name"
-          required
-        />
-        <input
-          className="form-control-sm"
-          type="text"
-          onChange={handlerChangeDesMED}
-          placeholder="Goods Description"
-          required
-        />
-        <button
-          className="btn btn-outline-success btn-sm"
-          onSubmit={handlerSubmitMED}
-        >
-          Order
-        </button>
-      </form>
-      <br />
-      <h5>Ordered Goods:</h5>
-      <table className="table table-bordered">
-        <thead>
-          <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Name</th>
-            <th scope="col">Description</th>
-            <th scope="col">Current Stage</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.keys(MED).map(function (key) {
-            return (
+      <div className="card-modern">
+        <div className="d-flex justify-content-between align-items-center flex-wrap mb-3">
+          <span className="account-info text-muted"><b>🔑 Ví hiện tại:</b> {currentaccount}</span>
+          <button onClick={() => history.push("/")} className="btn btn-custom-outline">🏠 Trang chủ</button>
+        </div>
+
+        <h4 className="card-title">📦 Tạo đơn hàng mới</h4>
+        <form onSubmit={handlerSubmitMED} className="input-group-custom mb-4">
+          <input className="form-control-sm-custom" type="text" onChange={(e)=>setMedName(e.target.value)} placeholder="Tên sản phẩm" required />
+          <input className="form-control-sm-custom" type="text" onChange={(e)=>setMedDes(e.target.value)} placeholder="Mô tả sản phẩm" required />
+          <button className="btn btn-custom-primary" type="submit">➕ Đặt hàng</button>
+        </form>
+
+        <h4 className="card-title">📋 Danh sách đơn hàng</h4>
+        <table className="table table-custom">
+          <thead><tr><th>ID</th><th>Tên sản phẩm</th><th>Mô tả</th><th>Giai đoạn hiện tại</th></tr></thead>
+          <tbody>
+            {Object.keys(MED).map(key => (
               <tr key={key}>
                 <td>{MED[key].id}</td>
                 <td>{MED[key].name}</td>
                 <td>{MED[key].description}</td>
-                <td>{MedStage[key]}</td>
+                <td><span className="badge-stage">{MedStage[key] || "Chưa xử lý"}</span></td>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
